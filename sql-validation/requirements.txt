@@ -1,0 +1,2 @@
+# validate.py and rules.py use only the Python standard library (sqlite3, sys,
+# pathlib). No third-party packages are required to run the validator.

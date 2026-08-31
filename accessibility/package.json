@@ -1,0 +1,13 @@
+{
+  "name": "qa-full-lifecycle-a11y",
+  "version": "1.0.0",
+  "description": "Accessibility (axe-core + Playwright) scans for the QA full-lifecycle portfolio.",
+  "private": true,
+  "scripts": {
+    "test:a11y": "playwright test --config=playwright-a11y.config.ts"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.0",
+    "@playwright/test": "^1.48.0"
+  }
+}
