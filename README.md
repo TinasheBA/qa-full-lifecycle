@@ -1,5 +1,7 @@
 # qa-full-lifecycle
 
+[![CI](https://github.com/TinasheBA/qa-full-lifecycle/actions/workflows/ci.yml/badge.svg)](https://github.com/TinasheBA/qa-full-lifecycle/actions/workflows/ci.yml)
+
 > A single repository that walks a QA engineer through the whole testing lifecycle:
 > manual, SQL, API, UI automation, performance, accessibility, all wired together by CI.
 
