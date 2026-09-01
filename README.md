@@ -5,7 +5,7 @@
 > A single repository that walks a QA engineer through the whole testing lifecycle:
 > manual, SQL, API, UI automation, performance, accessibility, all wired together by CI.
 
-The idea is to not just claim you can test, but to show it. Each folder is a
+Anyone can say they can test. The point of this repo is to show it. Each folder is a
 self-contained discipline that builds toward a real, runnable suite against two widely
 known demo applications:
 
