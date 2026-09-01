@@ -13,8 +13,12 @@ venv/
 # Local SQLite
 demo.db
 
-# Local reports (generated artifacts ignored; README/docs are committed)
+# Local reports (generated artifacts ignored; README/docs are committed).
+# expected-defects.json is a committed baseline, not a generated report, and
+# lives outside any reports/ dir so it is not caught here.
 **/reports/*.json
+**/reports/*.txt
+**/reports/*.xml
 
 # Env / OS
 .env

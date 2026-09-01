@@ -22,8 +22,8 @@ known demo applications:
 | `accessibility/` | WCAG scans on key flows | axe-core + Playwright | yes |
 | `.github/workflows/` | CI gating of every runnable suite | GitHub Actions | — |
 
-Reports from every runnable suite are uploaded as CI artifacts, so each discipline
-leaves an auditable result behind.
+Every one of those five jobs uploads its report as a CI artifact with `if: always()`,
+so a red run still leaves the evidence behind, which is when you most need it.
 
 ## Quick start
 
@@ -38,9 +38,8 @@ cd ui-automation
 npm install
 npm run test:e2e
 
-# SQL validation
+# SQL validation (standard library only, no install needed)
 cd sql-validation
-pip install -r requirements.txt
 python validate.py
 ```
 
@@ -61,10 +60,20 @@ qa-full-lifecycle/
 ## Status
 
 - [x] Manual testing pack (requirements, cases, bug reports, traceability)
-- [x] SQL validation suite (validated locally; catches 4 planted defects)
-- [x] API test suite (9 tests, validated live)
-- [x] UI automation suite (POM; 15/15 on chromium, firefox and webkit)
-- [x] Performance smoke + load scripts (validated against a local k6)
-- [x] Accessibility scans (baseline committed; fails on new violations)
-- [ ] CI workflow (committed, but first run in GitHub Actions pending)
-- [ ] Push to GitHub + set metadata
+- [x] SQL validation suite (5 rules over deliberately dirty seed data, gated on drift
+      from a committed baseline rather than on defect count)
+- [x] API test suite (11 tests over 3 endpoints; every request has a timeout)
+- [x] UI automation suite (POM; 9 specs across chromium, firefox and webkit = 27 runs)
+- [x] Performance smoke + load scripts (smoke gates CI, load is a local-only run)
+- [x] Accessibility scans (baseline gates both new rule ids and node-count growth)
+- [x] CI workflow (five jobs, each uploading its report as an artifact even on failure)
+
+## Coverage
+
+`manual-testing/traceability-matrix.md` is the source of truth. 16 of 16 requirements
+are mapped to a test case; 12 have a full automated regression check, 1 is partially
+automated, 3 are manual only. The manual-only rows are listed there with the reason.
+
+The two numbers are kept apart on purpose. "Every requirement has a test case" and
+"every requirement is guarded on every push" are different claims, and reporting them
+as one number hides which requirements are actually protected.

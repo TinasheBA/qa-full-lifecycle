@@ -1,7 +1,6 @@
 from jsonschema import validate
 
 from schemas import PRODUCT_SCHEMA, PRODUCTS_LIST_SCHEMA
-from conftest import products_response
 
 
 def test_products_list_returns_200(products_response):

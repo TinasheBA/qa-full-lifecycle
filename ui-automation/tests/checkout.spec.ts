@@ -24,8 +24,16 @@ test.describe("Checkout flow", () => {
 
     await checkout.fillInfo("Tinashe", "Maphela", "2001");
     await checkout.continue();
+
+    // REQ-4.3: the overview step has to show the right item and totals that add up.
+    await checkout.expectOverviewItem("Sauce Labs Backpack");
+    await checkout.expectOverviewTotalsAddUp();
+
     await checkout.finish();
     await checkout.expectSuccess();
+
+    // REQ-4.5: a completed purchase empties the cart.
+    await checkout.expectCartCleared();
   });
 
   test("empty first name blocks checkout", async ({ page }) => {

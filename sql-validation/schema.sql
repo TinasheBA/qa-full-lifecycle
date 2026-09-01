@@ -76,3 +76,9 @@ INSERT INTO orders (id, customer_id, status, total) VALUES (5, 1, 'pending', 999
 INSERT INTO order_items (id, order_id, product_id, quantity, unit_price) VALUES (5, 5, 3, 1, 5.99);
 
 PRAGMA foreign_keys = ON;
+
+-- 6. A phantom order: a real customer, a non-zero total, and no line items at all.
+--    This one is FK-legal, so nothing structural stops it. It exists to keep
+--    rule_totals_balance honest: the naive version of that rule aggregates NULL
+--    for an order with no items and drops the row instead of flagging it.
+INSERT INTO orders (id, customer_id, status, total) VALUES (6, 2, 'pending', 50.00);

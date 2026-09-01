@@ -15,6 +15,8 @@ a free, widely used demo API covering products, brands, and login.
 | `tests/test_login.py` | Request/response contract for login |
 | `requirements.txt` | Python deps |
 
+11 tests across the three endpoints.
+
 ## Run
 
 ```bash
@@ -30,6 +32,10 @@ pytest -v
   response, so the suite makes one call per endpoint instead of per test. The
   schema files (`schemas.py`) are what make these contract tests rather than plain
   smoke checks: a changed field type or a missing required key fails the run.
+- **Every request has a timeout**: `config.REQUEST_TIMEOUT`. `requests` has no default
+  timeout, so a call without one waits forever if the far end accepts the connection and
+  then goes quiet. Against a public demo API that means a hung session-scoped fixture
+  taking the whole CI job with it, up to the runner's six-hour ceiling.
 - **Login flow**: we test the stable contract the demo API guarantees. The `verifyLogin`
   endpoint is reachable, unknown users return `responseCode 404` ("User not found"), and
   missing fields are a bad request. The demo's success path needs a real registered
