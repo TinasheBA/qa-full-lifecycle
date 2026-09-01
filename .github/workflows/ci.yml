@@ -1,6 +1,7 @@
 # QA Full-Lifecycle CI
 # Gates every runnable suite: SQL validation, API, UI automation, a11y, perf smoke.
-# Each uploads its report as a CI artifact.
+# Each job uploads its report as a CI artifact, with `if: always()` so a red run
+# still leaves the evidence behind, which is when you most need it.
 
 name: CI
 
@@ -20,11 +21,12 @@ jobs:
       - name: Run SQL validation (stdlib only)
         run: python validate.py
         working-directory: sql-validation
-      - name: Upload SQL report
+      - name: Upload SQL validation report
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: sql-report
-          path: sql-validation/demo.db
+          path: sql-validation/reports
 
   api-testing:
     runs-on: ubuntu-latest
@@ -35,8 +37,14 @@ jobs:
           python-version: "3.12"
       - run: pip install -r api-testing/requirements.txt
       - name: Run API tests
-        run: pytest -v
+        run: pytest -v --junitxml=reports/junit.xml
         working-directory: api-testing
+      - name: Upload API report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: api-report
+          path: api-testing/reports
 
   ui-automation:
     runs-on: ubuntu-latest
@@ -89,5 +97,14 @@ jobs:
           curl -L https://github.com/grafana/k6/releases/download/v0.49.0/k6-v0.49.0-linux-amd64.tar.gz | tar xz
           sudo mv k6-*/k6 /usr/local/bin/
       - name: Run k6 smoke test
-        run: k6 run smoke.js
+        run: |
+          set -o pipefail
+          mkdir -p reports
+          k6 run smoke.js | tee reports/smoke.txt
         working-directory: performance
+      - name: Upload perf report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: perf-smoke-report
+          path: performance/reports

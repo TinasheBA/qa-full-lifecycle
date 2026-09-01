@@ -1,5 +1,12 @@
 {
-  "saucedemo-login": [],
-  "saucedemo-inventory": ["select-name"],
-  "automationexercise-home": ["button-name", "color-contrast", "link-name"]
+  "_format": "page -> { axe rule id -> max allowed nodes, or null to allow the rule without capping node count }",
+  "saucedemo-login": {},
+  "saucedemo-inventory": {
+    "select-name": 1
+  },
+  "automationexercise-home": {
+    "button-name": 1,
+    "color-contrast": null,
+    "link-name": 4
+  }
 }

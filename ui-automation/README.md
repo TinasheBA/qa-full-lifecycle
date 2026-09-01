@@ -31,7 +31,18 @@ npm run test:e2e
 
 ## Coverage
 
-Mirrors the manual test pack (`../manual-testing/test-cases.md`):
-- Happy-path login + checkout (TC-01, TC-10)
-- Negative login (TC-02, TC-03)
-- Add/remove item + cart (TC-05, TC-08)
+9 specs, each run on chromium, firefox and webkit (27 runs). They mirror the manual test
+pack (`../manual-testing/test-cases.md`):
+
+| Spec | Test cases |
+|------|-----------|
+| `tests/login.spec.ts` | TC-01 valid login, TC-02 invalid credentials, TC-03 locked-out user |
+| `tests/cart.spec.ts` | TC-05 add updates badge, TC-06 Remove replaces Add, TC-07 cart lists items, TC-08 remove (empty + decrement cases) |
+| `tests/checkout.spec.ts` | TC-10 happy path (including the overview totals and the cart clearing), TC-11 empty first name |
+
+TC-04, TC-12, TC-13 and TC-14 are manual only. See
+`../manual-testing/traceability-matrix.md` for the requirement-by-requirement position.
+
+The overview totals are asserted as `subtotal + tax == total` rather than against
+hard-coded amounts, so the check survives the demo app repricing its catalogue but still
+fails if the arithmetic breaks.

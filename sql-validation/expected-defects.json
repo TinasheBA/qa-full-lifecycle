@@ -1,0 +1,7 @@
+{
+  "no_negative_prices": ["products#4"],
+  "no_orphan_order_items": ["order_items#4"],
+  "no_orphan_orders": ["orders#4"],
+  "totals_balance": ["orders#5", "orders#6"],
+  "required_fields": []
+}

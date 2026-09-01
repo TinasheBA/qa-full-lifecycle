@@ -8,19 +8,19 @@ tests reuse the cached response.
 import pytest
 import requests
 
-from config import product_url, brands_url
+from config import product_url, brands_url, REQUEST_TIMEOUT
 
 
 @pytest.fixture(scope="session")
 def products_response():
-    resp = requests.get(product_url())
+    resp = requests.get(product_url(), timeout=REQUEST_TIMEOUT)
     assert resp.status_code == 200
     return resp
 
 
 @pytest.fixture(scope="session")
 def brands_response():
-    resp = requests.get(brands_url())
+    resp = requests.get(brands_url(), timeout=REQUEST_TIMEOUT)
     assert resp.status_code == 200
     return resp
 
