@@ -4,8 +4,8 @@ Performance and load testing with [k6](https://k6.io/). A fast *smoke* test runs
 and a heavier *load* test runs locally.
 
 Targets:
-- **AutomationExercise API**: `GET /api/productsList` (public)
-- **SauceDemo**: `GET /` (login page)
+- `smoke.js` -> **AutomationExercise API**: `GET /api/productsList` (public)
+- `load.js` -> **test.k6.io**, Grafana's own public target for k6 practice
 
 ## Files
 
@@ -31,11 +31,21 @@ virtual users) in CI to prove the script and endpoints stay healthy, and keep th
 
 ## A note on load testing someone else's server
 
-`load.js` ramps to 20 virtual users against `automationexercise.com`, which is not ours.
-That is why it is deliberately kept out of CI: a pipeline that fires a staged ramp at a
-free public demo service on every push is abusing it, however small the numbers look.
-Run it by hand, sparingly, and point it at your own environment before you turn the
-numbers up. The smoke test in CI is 2 VUs for 20 seconds, which is ordinary traffic.
+`load.js` ramps to 20 virtual users, which is real traffic. It used to aim that at
+`automationexercise.com`, which is not ours, and keeping it out of CI was not enough of
+an answer: a staged ramp at a free public demo service is rude whenever it runs, not only
+when a pipeline runs it. It now points at `test.k6.io`, which Grafana publishes for
+exactly this purpose. Point it at your own environment before you turn the numbers up.
+
+The smoke test still reads the AutomationExercise API, at 2 VUs for 20 seconds. That is
+ordinary traffic for a read-only health check, and it is the suite that has to exercise
+the same endpoint the API tests cover.
+
+## A note on what makes a check fail
+
+k6 only sets a non-zero exit code from `thresholds`, never from `check()`. Both scripts
+therefore put a threshold on the `checks` metric. Without it the checks are a report, not
+a gate: a 200 response carrying an empty or garbage body would pass the run.
 
 ## Thresholds note
 

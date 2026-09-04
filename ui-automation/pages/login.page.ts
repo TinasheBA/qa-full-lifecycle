@@ -1,23 +1,35 @@
-import { Page, expect } from "@playwright/test";
+import { Locator, Page, expect } from "@playwright/test";
 
 export class LoginPage {
   constructor(private readonly page: Page) {}
+
+  private get error(): Locator {
+    return this.page.getByTestId("error");
+  }
 
   async goto() {
     await this.page.goto("/");
   }
 
   async login(username: string, password: string) {
-    await this.page.getByPlaceholder("Username").fill(username);
-    await this.page.getByPlaceholder("Password").fill(password);
-    await this.page.getByRole("button", { name: "Login" }).click();
+    await this.page.getByTestId("username").fill(username);
+    await this.page.getByTestId("password").fill(password);
+    await this.page.getByTestId("login-button").click();
   }
 
   async expectLoggedIn() {
     await expect(this.page).toHaveURL(/inventory\.html/);
   }
 
-  async errorText(): Promise<string> {
-    return (await this.page.locator('[data-test="error"]').textContent()) ?? "";
+  /**
+   * Assert on the login error banner.
+   *
+   * This is an auto-retrying assertion on the locator rather than a one-shot
+   * read of textContent(). The banner is rendered client-side after the click,
+   * so reading its text once races the render: the read can land before the
+   * element exists and return an empty string.
+   */
+  async expectError(message: string | RegExp) {
+    await expect(this.error).toContainText(message);
   }
 }

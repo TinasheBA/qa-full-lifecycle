@@ -8,6 +8,10 @@ export default defineConfig({
   reporter: [["list"], ["html", { open: "never" }]],
   use: {
     baseURL: "https://www.saucedemo.com",
+    // SauceDemo marks its elements with `data-test`, not Playwright's default
+    // `data-testid`. Pointing the option here lets the page objects use
+    // getByTestId() instead of raw attribute selectors.
+    testIdAttribute: "data-test",
     trace: "on-first-retry",
   },
   projects: [

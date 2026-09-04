@@ -2,10 +2,12 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "commonjs",
+    "moduleResolution": "node",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true
   },
-  "include": ["pages/**/*.ts", "tests/**/*.ts", "playwright.config.ts"]
+  "include": ["pages/**/*.ts", "tests/**/*.ts", "auth.ts", "playwright.config.ts"]
 }

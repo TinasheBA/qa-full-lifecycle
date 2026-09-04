@@ -18,13 +18,24 @@ import path from "node:path";
 //      to fifty is a real regression that never introduces a new rule id.
 //
 // Node caps are opt-in per rule, because they are only meaningful where the count
-// is stable. `null` means "this rule is known, don't cap its count", used for
-// color-contrast on the AutomationExercise home page, whose count tracks rotating
+// is stable. `null` means "this rule is known, don't cap its count", used on the
+// AutomationExercise home page for color-contrast, whose count tracks rotating
 // marketing content rather than anything the app did wrong.
+//
+// Every scan waits for a real element on the page first. This matters more than it
+// looks: page.goto() resolves on `load`, and the AutomationExercise home page builds
+// its content after that, so axe would sometimes scan a half-built DOM. That does not
+// fail loudly, it produces a different and much smaller violation set (three
+// color-contrast nodes instead of forty-one, plus rule ids the full page never
+// reports), which the baseline gate then reports as a regression. Waiting for the
+// product grid makes the scan deterministic: five consecutive runs return an
+// identical violation set, where before roughly one run in five differed.
 
 type PageBaseline = Record<string, number | null>;
 
-const baselinePath = path.resolve(process.cwd(), "baseline.json");
+// Resolved from this file, not from process.cwd(), so the suite runs from any
+// directory rather than only from accessibility/.
+const baselinePath = path.resolve(__dirname, "..", "baseline.json");
 const rawBaseline = JSON.parse(readFileSync(baselinePath, "utf8")) as Record<string, unknown>;
 const baseline: Record<string, PageBaseline> = Object.fromEntries(
   Object.entries(rawBaseline).filter(([key]) => !key.startsWith("_"))
@@ -37,9 +48,10 @@ async function scan(page: import("@playwright/test").Page, name: string) {
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
     .analyze();
 
-  await mkdir("reports", { recursive: true });
+  const reportDir = path.resolve(__dirname, "..", "reports");
+  await mkdir(reportDir, { recursive: true });
   await writeFile(
-    `reports/a11y-${name}.json`,
+    path.join(reportDir, `a11y-${name}.json`),
     JSON.stringify(
       {
         page: name,
@@ -102,6 +114,7 @@ function assertWithinBaseline(name: string, violations: Violation[]) {
 
 test("SauceDemo login page a11y", async ({ page }) => {
   await page.goto("https://www.saucedemo.com");
+  await expect(page.getByTestId("login-button")).toBeVisible();
   const results = await scan(page, "saucedemo-login");
   assertWithinBaseline("saucedemo-login", results.violations);
 });
@@ -112,12 +125,16 @@ test("SauceDemo inventory page a11y", async ({ page }) => {
   await page.getByPlaceholder("Password").fill("secret_sauce");
   await page.getByRole("button", { name: "Login" }).click();
   await expect(page).toHaveURL(/inventory\.html/);
+  await expect(page.getByTestId("inventory-list")).toBeVisible();
   const results = await scan(page, "saucedemo-inventory");
   assertWithinBaseline("saucedemo-inventory", results.violations);
 });
 
 test("AutomationExercise home page a11y", async ({ page }) => {
   await page.goto("https://www.automationexercise.com");
+  // The product grid is the last thing this page builds, so its first tile being
+  // visible is the signal that there is a whole page here to scan.
+  await expect(page.locator(".features_items .product-image-wrapper").first()).toBeVisible();
   const results = await scan(page, "automationexercise-home");
   assertWithinBaseline("automationexercise-home", results.violations);
 });

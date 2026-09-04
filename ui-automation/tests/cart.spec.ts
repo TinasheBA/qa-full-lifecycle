@@ -1,5 +1,5 @@
-import { test, expect } from "@playwright/test";
-import { LoginPage } from "../pages/login.page";
+import { test } from "@playwright/test";
+import { asUser } from "../auth";
 import { InventoryPage } from "../pages/inventory.page";
 import { CartPage } from "../pages/cart.page";
 
@@ -7,16 +7,12 @@ const PRODUCT = "Sauce Labs Backpack";
 const SECOND_PRODUCT = "Sauce Labs Bike Light";
 
 test.describe("Cart", () => {
-  test.beforeEach(async ({ page }) => {
-    const login = new LoginPage(page);
-    await login.goto();
-    await login.login("standard_user", "secret_sauce");
-    await login.expectLoggedIn();
-  });
+  test.use(asUser("standard_user"));
 
   // TC-05 (REQ-2.2) + TC-06 (REQ-2.3)
   test("adding an item updates the badge and swaps in a Remove control", async ({ page }) => {
     const inventory = new InventoryPage(page);
+    await inventory.goto();
 
     await inventory.expectCartEmpty();
     await inventory.addToCart(PRODUCT);
@@ -33,6 +29,7 @@ test.describe("Cart", () => {
   test("cart lists every added item with quantity 1", async ({ page }) => {
     const inventory = new InventoryPage(page);
     const cart = new CartPage(page);
+    await inventory.goto();
 
     await inventory.addToCart(PRODUCT);
     await inventory.addToCart(SECOND_PRODUCT);
@@ -50,6 +47,7 @@ test.describe("Cart", () => {
   test("removing the only item empties the cart and clears the badge", async ({ page }) => {
     const inventory = new InventoryPage(page);
     const cart = new CartPage(page);
+    await inventory.goto();
 
     await inventory.addToCart(PRODUCT);
     await inventory.expectCartCount(1);
@@ -65,6 +63,7 @@ test.describe("Cart", () => {
   test("removing one of two items decrements the badge", async ({ page }) => {
     const inventory = new InventoryPage(page);
     const cart = new CartPage(page);
+    await inventory.goto();
 
     await inventory.addToCart(PRODUCT);
     await inventory.addToCart(SECOND_PRODUCT);
@@ -75,6 +74,6 @@ test.describe("Cart", () => {
 
     await cart.expectItemCount(1);
     await cart.expectItem(SECOND_PRODUCT);
-    await expect(page.locator(".shopping_cart_badge")).toHaveText("1");
+    await cart.expectCartCount(1);
   });
 });

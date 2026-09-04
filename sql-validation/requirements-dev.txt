@@ -1,0 +1,3 @@
+# validate.py and rules.py themselves need nothing beyond the standard library.
+# These are only for running test_rules.py, which tests the rules.
+pytest>=7.0
