@@ -2,6 +2,12 @@
 # Gates every runnable suite: SQL validation, API, UI automation, a11y, perf smoke.
 # Each job uploads its report as a CI artifact, with `if: always()` so a red run
 # still leaves the evidence behind, which is when you most need it.
+#
+# The nightly schedule is not decoration. Every suite here except the SQL one
+# reads a live third-party demo site, so a badge that is only refreshed on push
+# says "this passed whenever I last committed", not "this passes". The scheduled
+# run makes the badge mean the second thing, and it surfaces a demo site
+# changing under the suite on the day it happens rather than months later.
 
 name: CI
 
@@ -9,6 +15,15 @@ on:
   push:
     branches: [main]
   pull_request:
+  schedule:
+    - cron: "0 3 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   sql-validation:
@@ -18,6 +33,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Install test dependencies
+        run: pip install -r requirements-dev.txt
+        working-directory: sql-validation
+      - name: Test the validation rules
+        run: python -m pytest test_rules.py -v
+        working-directory: sql-validation
       - name: Run SQL validation (stdlib only)
         run: python validate.py
         working-directory: sql-validation
@@ -35,6 +56,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+          cache: pip
+          cache-dependency-path: api-testing/requirements.txt
       - run: pip install -r api-testing/requirements.txt
       - name: Run API tests
         run: pytest -v --junitxml=reports/junit.xml
@@ -53,7 +76,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm install
+          cache: npm
+          cache-dependency-path: ui-automation/package-lock.json
+      - run: npm ci
+        working-directory: ui-automation
+      - name: Typecheck
+        run: npm run typecheck
+        working-directory: ui-automation
+      - name: Lint (catches a missing await on a click or an expect)
+        run: npm run lint
         working-directory: ui-automation
       - run: npx playwright install --with-deps chromium firefox webkit
         working-directory: ui-automation
@@ -74,7 +105,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm install
+          cache: npm
+          cache-dependency-path: accessibility/package-lock.json
+      - run: npm ci
+        working-directory: accessibility
+      - name: Typecheck
+        run: npm run typecheck
         working-directory: accessibility
       - run: npx playwright install --with-deps chromium
         working-directory: accessibility

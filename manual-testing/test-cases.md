@@ -102,10 +102,20 @@
 - **Steps:** As TC-11 but leave postal code blank
 - **Expected:** Error: "Postal Code is required".
 
-## Sorting (known flaw)
+## Sorting
 
-### TC-14 — Sort by name A→Z / Z→A available
-- **Ref:** REQ-5.1
+### TC-14 — Sort by name reorders the list in both directions
+- **Ref:** REQ-5.1, REQ-5.2
 - **Steps:**
-  1. Log in; switch the sort dropdown to "Name (Z to A)"
-- **Expected:** The option is selectable (see BUG-001 for the defective behavior).
+  1. Log in as `standard_user`; note the default product order
+  2. Switch the sort dropdown to "Name (Z to A)"
+  3. Switch it back to "Name (A to Z)"
+- **Expected:** Step 2 reverses the list; step 3 restores the original order.
+
+### TC-15 — Sorting does not reorder for `problem_user`
+- **Ref:** BUG-001
+- **Steps:**
+  1. Log in as `problem_user`; note the default product order
+  2. Switch the sort dropdown to "Name (Z to A)"
+- **Expected:** The list is unchanged. This is the defect recorded as BUG-001, and it
+  is asserted rather than skipped so the suite reports it the day SauceDemo fixes it.

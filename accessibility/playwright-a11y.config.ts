@@ -3,10 +3,12 @@ import { defineConfig, devices } from "@playwright/test";
 export default defineConfig({
   testDir: "./tests",
   fullyParallel: true,
-  retries: process.env.CI ? 2 : 0,
+  // No retries. A baseline gate asserts a deterministic scan result, so a run
+  // that only passes on the second attempt is information, not noise.
+  retries: 0,
   reporter: [["list"]],
   use: {
-    baseURL: "https://www.saucedemo.com",
+    testIdAttribute: "data-test",
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
 });

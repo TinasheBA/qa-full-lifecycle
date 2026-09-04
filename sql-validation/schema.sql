@@ -82,3 +82,10 @@ PRAGMA foreign_keys = ON;
 --    rule_totals_balance honest: the naive version of that rule aggregates NULL
 --    for an order with no items and drops the row instead of flagging it.
 INSERT INTO orders (id, customer_id, status, total) VALUES (6, 2, 'pending', 50.00);
+
+-- 7. A customer with a blank name and email. Both columns are NOT NULL, which
+--    stops a NULL but does nothing about an empty string, so this is the shape
+--    the defect actually takes in this schema. Without it rule_required_fields
+--    is the one rule with nothing to catch, and a rule that never fires is a
+--    rule nobody has tested.
+INSERT INTO customers (id, name, email) VALUES (4, '', '');

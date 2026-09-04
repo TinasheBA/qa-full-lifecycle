@@ -38,10 +38,16 @@ and a product inventory.
 - 4.4 Completing a purchase shows a success confirmation ("Thank you for your order!").
 - 4.5 The cart is cleared after a successful purchase.
 
-### REQ-5 — Sorting (known demo flaw)
+### REQ-5 — Sorting
 - 5.1 Sorting by Name (A→Z) and (Z→A) is available.
-- 5.2 *Accepted behavior:* Sorting by Name does **not** reorder products. This is a known
-      demo bug, documented as defect BUG-001 below and tracked in `bug-report-template.md`.
+- 5.2 Sorting by Name reorders the product list accordingly.
+
+  This requirement previously recorded the opposite, that sorting does not reorder,
+  as accepted behaviour. That was wrong: sorting works correctly for `standard_user`,
+  which is the account the whole suite runs as. The account that fails to reorder is
+  `problem_user`, one of SauceDemo's deliberately broken logins, so the flaw belongs
+  to that fixture rather than to the sort feature. BUG-001 now records it against
+  `problem_user` and TC-15 covers it.
 
 ## Out of scope
 

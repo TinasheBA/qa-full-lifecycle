@@ -15,7 +15,7 @@ a free, widely used demo API covering products, brands, and login.
 | `tests/test_login.py` | Request/response contract for login |
 | `requirements.txt` | Python deps |
 
-11 tests across the three endpoints.
+6 tests across the three endpoints.
 
 ## Run
 
@@ -26,8 +26,13 @@ pytest -v
 
 ## Coverage highlights
 
-- **Products list**: 200, matches a JSON schema, non-empty.
-- **Brands list**: 200, matches a JSON schema, non-empty.
+- **Products list**: matches a JSON schema, non-empty.
+- **Brands list**: matches a JSON schema, non-empty.
+- **No test that cannot fail on its own**: the status-code assertion lives in the
+  session fixture, so a separate `returns_200` test could never fail without the
+  fixture failing first and erroring every test in the file. Likewise the list schema
+  already validates every item, so a second test validating one item proved nothing new.
+  Both were removed rather than counted.
 - **Single fetch per endpoint**: the session-scoped `conftest.py` fixtures cache each
   response, so the suite makes one call per endpoint instead of per test. The
   schema files (`schemas.py`) are what make these contract tests rather than plain
