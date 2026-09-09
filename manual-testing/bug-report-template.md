@@ -46,14 +46,15 @@ The template above stays blank. This is the one filled-in report the suite refer
 2. Note the default product order on the inventory page
 3. Set the sort dropdown to "Name (Z to A)"
 
-**Expected result:** The six products reverse, as they do for `standard_user`:
+**Expected result:** The dropdown holds "Name (Z to A)" and the six products reverse,
+as they do for `standard_user`:
 
 ```
 Test.allTheThings() T-Shirt (Red), Sauce Labs Onesie, Sauce Labs Fleece Jacket,
 Sauce Labs Bolt T-Shirt, Sauce Labs Bike Light, Sauce Labs Backpack
 ```
 
-**Actual result:** The dropdown selection changes and the list does not move:
+**Actual result:** The dropdown reverts to "Name (A to Z)" and the list does not move:
 
 ```
 Sauce Labs Backpack, Sauce Labs Bike Light, Sauce Labs Bolt T-Shirt,
@@ -61,8 +62,15 @@ Sauce Labs Fleece Jacket, Sauce Labs Onesie, Test.allTheThings() T-Shirt (Red)
 ```
 
 **Evidence:** `ui-automation/tests/inventory.spec.ts`, the "Inventory (problem_user)"
-block. The same steps run as `standard_user` in the block above it and do reorder,
-which is what isolates this to the account rather than to the sort control.
+block. The same steps run as `standard_user` in the block above it, where the dropdown
+holds `za` and the list reverses, which is what isolates this to the account rather
+than to the sort feature.
+
+**Correction (this report was wrong once):** it previously recorded the dropdown
+selection as changing while only the list stayed put. Adding an assertion on the
+dropdown's value failed, and a probe of both accounts showed why: as `standard_user`
+the control's value goes to `za`, and as `problem_user` it stays `az`. The control
+rejects the selection outright. The description above is the measured behaviour.
 
 **Status:** Open, will not fix
 

@@ -38,7 +38,10 @@
 - **Steps:**
   1. Log in as `standard_user`
   2. Observe the inventory list
-- **Expected:** Each product shows name, description, and price.
+  3. Check every row, not a sample
+- **Expected:** All six products show a name, a description, and a price formatted as
+  currency. The automated check asserts the row count first, so a product vanishing
+  from the catalogue fails the case rather than shrinking what it covers.
 
 ### TC-05 — Add item updates cart
 - **Ref:** REQ-2.2
@@ -112,10 +115,15 @@
   3. Switch it back to "Name (A to Z)"
 - **Expected:** Step 2 reverses the list; step 3 restores the original order.
 
-### TC-15 — Sorting does not reorder for `problem_user`
+### TC-15 — Sorting is rejected for `problem_user`
 - **Ref:** BUG-001
 - **Steps:**
-  1. Log in as `problem_user`; note the default product order
+  1. Log in as `problem_user`; note the default product order and that the dropdown
+     reads "Name (A to Z)"
   2. Switch the sort dropdown to "Name (Z to A)"
-- **Expected:** The list is unchanged. This is the defect recorded as BUG-001, and it
-  is asserted rather than skipped so the suite reports it the day SauceDemo fixes it.
+  3. Read the dropdown again
+- **Expected:** The dropdown has reverted to "Name (A to Z)" and the list is unchanged.
+  Both halves matter: an unchanged list on its own is also what a sort that applied
+  and was then ignored would produce, and that is a different defect. This is the
+  defect recorded as BUG-001, and it is asserted rather than skipped so the suite
+  reports it the day SauceDemo fixes it.

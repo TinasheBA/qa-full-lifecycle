@@ -51,8 +51,25 @@ export class InventoryPage {
     await expect(row.getByTestId("inventory-item-price")).toHaveText(/^\$\d+\.\d{2}$/);
   }
 
+  /** REQ-2.1 / TC-04: the listing holds exactly the products we expect to check. */
+  async expectProductCount(count: number) {
+    await expect(this.page.getByTestId("inventory-item")).toHaveCount(count);
+  }
+
   async sortBy(option: SortOption) {
     await this.page.getByTestId("product-sort-container").selectOption(option);
+  }
+
+  /**
+   * REQ-5.1 / BUG-001: which option the sort control is actually holding.
+   *
+   * Separate from the resulting order on purpose. Checking the order alone
+   * cannot distinguish "the control took the selection and the list ignored it"
+   * from "the control never took the selection", and those are different bugs.
+   * TC-15 asserts this one is the second.
+   */
+  async expectSortSelection(option: SortOption) {
+    await expect(this.page.getByTestId("product-sort-container")).toHaveValue(option);
   }
 
   async expectProductOrder(names: string[]) {
